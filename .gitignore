@@ -1,0 +1,39 @@
+# Node.js
+node_modules/
+*.log
+*.pid
+*.lock
+*.swp
+
+# Build artifacts
+build/
+dist/
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+*.sublime*
+
+# Environment variables
+.env
+
+# Logs
+logs/
+
+# Dependencies generated files
+package-lock.json
+yarn.lock
+
+# Sensitive information
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Compiled TypeScript files
+*.js
+
+# Compiled JavaScript files
+*.js.map
+*.js.lint
+*.js.map.lint
