@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dashboardRoutes from './routes/dashboard.route';
+import expenseSummaryRoutes from './routes/expense-summary.route';
 import expenseRoutes from './routes/expense.route';
 import wishlistRoutes from './routes/wishlist.route';
 import lookupRoutes from './routes/lookup.route';
@@ -19,6 +20,7 @@ app.use(cors());
 
 // Routes
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/expense-summary', expenseSummaryRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/wishlists', wishlistRoutes);
 app.use('/api/lookup', lookupRoutes);

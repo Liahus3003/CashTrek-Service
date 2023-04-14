@@ -19,10 +19,8 @@ export const getExpenseDataLast6Months = async (
       createdAt: { $gte: sixMonthsAgo, $lte: currentDate },
     });
 
-    // Return the expenses as JSON response
     res.status(200).json({ expenses });
   } catch (err) {
-    // Handle any errors that occurred during the database query
     console.error("Failed to retrieve expense data for the last 6 months", err);
     res
       .status(500)
@@ -58,14 +56,8 @@ export const getExpensesSumLast6MonthsByCategoryType = async (
       },
     ]);
 
-    // Return the expenses as JSON response
     res.status(200).json({ expenses });
   } catch (err) {
-    // Handle any errors that occurred during the database query
-    console.error(
-      "Failed to retrieve expenses sum for last 6 months by category type",
-      err
-    );
     res
       .status(500)
       .json({
