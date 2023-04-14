@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import dashboardRoutes from './routes/dashboard.route';
 import expenseRoutes from './routes/expense.route';
 import wishlistRoutes from './routes/wishlist.route';
 import lookupRoutes from './routes/lookup.route';
@@ -17,13 +18,13 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Routes
-app.use('/api/expenses', expenseRoutes); // Expense routes
-app.use('/api/wishlists', wishlistRoutes); // Wishlist routes
-app.use('/api/lookup', lookupRoutes); // Wishlist routes
-app.use('/api/auth', authRoutes); // Auth routes
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/wishlists', wishlistRoutes);
+app.use('/api/lookup', lookupRoutes);
+app.use('/api/auth', authRoutes);
 
-// Start the server
-const PORT = 3000; // Replace with your desired port number
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

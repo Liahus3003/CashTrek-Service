@@ -4,6 +4,7 @@ export interface IExpense extends Document {
   name: string;
   amount: number;
   category: string;
+  transactionType: string;
   date: Date;
   notes: string;
   site: string;
@@ -19,6 +20,7 @@ const ExpenseSchema = new Schema(
     name: { type: String, required: true },
     amount: { type: Number, required: true },
     category: { type: String, required: true },
+    transactionType: { type: String, required: true },
     date: { type: Date, default: Date.now },
     createdDate: { type: Date, default: Date.now },
     updatedDate: { type: Date, default: Date.now },
