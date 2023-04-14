@@ -4,9 +4,10 @@ import Expense, { IExpense } from '../models/expense.model';
 // Create expense
 export const createExpense = async (req: Request, res: Response) => {
   try {
-    const { description, amount, category, date }: IExpense = req.body;
+    const { name, amount, category, date, notes, site, isRebill, isSubscription, paymentMode }: IExpense = req.body;
 
-    const expense = new Expense({ description, amount, category, date });
+    const expense = new Expense({  name, amount, category, date, notes, site, isRebill, isSubscription, paymentMode,
+    createdDate: new Date() });
     const savedExpense = await expense.save();
 
     res.status(201).json(savedExpense);
@@ -32,7 +33,7 @@ export const getExpense = async (req: Request, res: Response) => {
     if (!expense) {
       return res.status(404).json({ error: 'Expense not found' });
     }
-    res.json(expense);
+    res.status(200).json(expense);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -41,7 +42,8 @@ export const getExpense = async (req: Request, res: Response) => {
 // Update an expense
 export const updateExpense = async (req: Request, res: Response) => {
   try {
-    const expense = await Expense.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const data = {...req.body, updatedDate: new Date()};
+    const expense = await Expense.findByIdAndUpdate(req.params.id, data, { new: true });
     if (!expense) {
       return res.status(404).json({ error: 'Expense not found' });
     }

@@ -2,6 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import expenseRoutes from './routes/expense.route';
+import wishlistRoutes from './routes/wishlist.route';
+import lookupRoutes from './routes/lookup.route';
 import authRoutes from './routes/auth.route';
 import dotenv from 'dotenv';
 
@@ -16,6 +18,8 @@ app.use(cors());
 
 // Routes
 app.use('/api/expenses', expenseRoutes); // Expense routes
+app.use('/api/wishlists', wishlistRoutes); // Wishlist routes
+app.use('/api/lookup', lookupRoutes); // Wishlist routes
 app.use('/api/auth', authRoutes); // Auth routes
 
 // Start the server
