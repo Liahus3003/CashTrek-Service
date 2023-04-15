@@ -8,9 +8,9 @@ import wishlistRoutes from './routes/wishlist.route';
 import lookupRoutes from './routes/lookup.route';
 import authRoutes from './routes/auth.route';
 import dotenv from 'dotenv';
+dotenv.config();
 
 import './config/db.config';
-dotenv.config();
 
 const app = express();
 
@@ -26,7 +26,7 @@ app.use('/api/wishlists', wishlistRoutes);
 app.use('/api/lookup', lookupRoutes);
 app.use('/api/auth', authRoutes);
 
-const PORT = 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
