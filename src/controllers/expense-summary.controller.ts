@@ -24,7 +24,7 @@ export const getExpensesForMonthPaginated = async (req: Request, res: Response) 
       .limit(parseInt(limit));
 
     res.status(200).json({ expenses });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Failed to retrieve expenses for the particular month", err);
     res
       .status(500)
@@ -79,7 +79,7 @@ export const getExpenseDetailsForMonth = async (
     ]);
 
     res.status(200).json({ expenses });
-  } catch (err) {
+  } catch (err: any) {
     console.error(
       "Failed to retrieve expense details for all days in the month",
       err
@@ -125,7 +125,7 @@ export const getTotalExpensesByCategoryTypeForMonth = async (
     ]);
 
     res.status(200).json({ expenses });
-  } catch (err) {
+  } catch (err: any) {
     console.error(
       "Failed to retrieve total expenses by category type for the month",
       err
@@ -158,7 +158,7 @@ export const getExpensesForYearPaginated = async (
       .limit(limit);
 
     res.status(200).json({ expenses });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Failed to retrieve expenses for the year", err);
     res.status(500).json({ error: "Failed to retrieve expenses for the year" });
   }
@@ -203,7 +203,7 @@ export const getExpenseDetailsForYear = async (req: Request, res: Response) => {
     });
 
     res.status(200).json({ expenseDetails });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Failed to retrieve expenses for the year");
   }
 };
@@ -243,7 +243,7 @@ export const getExpensesForYearByCategoryType = async (
     ]);
 
     res.status(200).json({ expenses });
-  } catch (err) {
+  } catch (err: any) {
     console.error(
       "Failed to retrieve expenses by categoryType for the year",
       err

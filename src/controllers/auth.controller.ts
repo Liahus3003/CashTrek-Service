@@ -26,7 +26,7 @@ export const signup = async (req: Request, res: Response) => {
     const token = jwt.sign({ userId: savedUser._id }, 'SECRET_KEY', { expiresIn: '1h' });
 
     res.status(201).json({ token, user: savedUser });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -52,7 +52,7 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign({ userId: user._id }, 'SECRET_KEY', { expiresIn: '1h' });
 
     res.json({ token, user });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };

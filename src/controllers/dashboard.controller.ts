@@ -20,7 +20,7 @@ export const getExpenseDataLast6Months = async (
     });
 
     res.status(200).json({ expenses });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Failed to retrieve expense data for the last 6 months", err);
     res
       .status(500)
@@ -57,7 +57,7 @@ export const getExpensesSumLast6MonthsByCategoryType = async (
     ]);
 
     res.status(200).json({ expenses });
-  } catch (err) {
+  } catch (err: any) {
     res
       .status(500)
       .json({
@@ -98,7 +98,7 @@ export const getUpcomingTransactionsByType = async (
 
     // Return the expenses and total count as JSON response
     res.status(200).json({ expenses, totalExpenses });
-  } catch (err) {
+  } catch (err: any) {
     // Handle any errors that occurred during the database query
     console.error("Failed to retrieve upcoming expenses by category type", err);
     res

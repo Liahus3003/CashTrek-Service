@@ -10,7 +10,7 @@ export const createLookup = async (req: Request, res: Response) => {
     const savedLookup = await lookup.save();
 
     res.status(201).json(savedLookup);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -20,7 +20,7 @@ export const getAllLookups = async (req: Request, res: Response) => {
   try {
     const lookups = await Lookup.find();
     res.json(lookups);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -33,7 +33,7 @@ export const getLookup = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Lookup not found' });
     }
     res.status(200).json(lookup);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -48,7 +48,7 @@ export const updateLookup = async (req: Request, res: Response) => {
     }
     res.json(lookup);
   }
-  catch (err) {
+  catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -61,7 +61,7 @@ export const deleteLookup = async (req: Request, res: Response) => {
         return res.status(404).json({ error: 'Lookup not found' });
       }
       res.json({ message: 'Lookup deleted successfully' });
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
 };

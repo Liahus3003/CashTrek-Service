@@ -10,7 +10,7 @@ export const createWishlist = async (req: Request, res: Response) => {
     const savedWishlist = await wishlist.save();
 
     res.status(201).json(savedWishlist);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -20,7 +20,7 @@ export const getAllWishlists = async (req: Request, res: Response) => {
   try {
     const wishlists = await Wishlist.find();
     res.json(wishlists);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -33,7 +33,7 @@ export const getWishlist = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Wishlist not found' });
     }
     res.status(200).json(wishlist);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -48,7 +48,7 @@ export const updateWishlist = async (req: Request, res: Response) => {
     }
     res.json(wishlist);
   }
-  catch (err) {
+  catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -61,7 +61,7 @@ export const deleteWishlist = async (req: Request, res: Response) => {
         return res.status(404).json({ error: 'Wishlist not found' });
       }
       res.json({ message: 'Wishlist deleted successfully' });
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
 };
