@@ -11,6 +11,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import './config/db.config';
+import { authenticateUser } from './middlewares/auth-middleware';
 
 const app = express();
 
@@ -19,12 +20,12 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Routes
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/expense-summary', expenseSummaryRoutes);
-app.use('/api/expenses', expenseRoutes);
-app.use('/api/wishlists', wishlistRoutes);
-app.use('/api/lookup', lookupRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', authenticateUser, dashboardRoutes);
+app.use('/api/expense-summary', authenticateUser, expenseSummaryRoutes);
+app.use('/api/expenses', authenticateUser, expenseRoutes);
+app.use('/api/wishlists', authenticateUser, wishlistRoutes);
+app.use('/api/lookup', authenticateUser, lookupRoutes);
+app.use('/api/auth', authenticateUser, authRoutes);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
