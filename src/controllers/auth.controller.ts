@@ -23,7 +23,7 @@ export const signup = async (req: Request, res: Response) => {
     const savedUser = await newUser.save();
 
     // Generate JWT token
-    const token = jwt.sign({ userId: savedUser._id }, 'SECRET_KEY', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: savedUser._id }, process.env.JWT_KEY ?? '', { expiresIn: '2d' });
 
     res.status(201).json({ token, user: savedUser });
   } catch (err: any) {
@@ -48,8 +48,14 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
+    const updatedUser = {
+      ...user,
+      lastLogin: new Date()
+    }
+    await updatedUser.save();
+
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, 'SECRET_KEY', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY ?? '', { expiresIn: '2d' });
 
     res.json({ token, user });
   } catch (err: any) {
