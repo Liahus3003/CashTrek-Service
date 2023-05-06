@@ -25,7 +25,7 @@ app.use('/api/expense-summary', authenticateUser, expenseSummaryRoutes);
 app.use('/api/expenses', authenticateUser, expenseRoutes);
 app.use('/api/wishlists', authenticateUser, wishlistRoutes);
 app.use('/api/lookup', authenticateUser, lookupRoutes);
-app.use('/api/auth', authenticateUser, authRoutes);
+app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

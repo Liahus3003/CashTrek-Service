@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGO_URI = `mongodb+srv://${encodeURIComponent(process.env?.MONGO_URI_USER ?? '')}:${encodeURIComponent(process.env.MONGO_URI_KEY ?? '')}@${encodeURIComponent(process.env.CLUSTER ?? '')}/cashtrek?retryWrites=true&w=majority`;
+const MONGO_URI = `mongodb+srv://${encodeURIComponent(process.env?.MONGO_URI_USER ?? '')}:${process.env.MONGO_URI_KEY}@${encodeURIComponent(process.env.CLUSTER ?? '')}/cashtrek?retryWrites=true&w=majority`;
 const connectOptions: any = {
     useNewUrlParser: true,
     useUnifiedTopology: true

@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import User from '../models/user.model';
+import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import User from "../models/user.model";
 
 // Register a new user
 export const signup = async (req: Request, res: Response) => {
@@ -11,7 +11,7 @@ export const signup = async (req: Request, res: Response) => {
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(400).json({ error: "User already exists" });
     }
 
     // Hash password
@@ -23,9 +23,22 @@ export const signup = async (req: Request, res: Response) => {
     const savedUser = await newUser.save();
 
     // Generate JWT token
-    const token = jwt.sign({ userId: savedUser._id }, process.env.JWT_KEY ?? '', { expiresIn: '2d' });
+    const token = jwt.sign(
+      { userId: savedUser._id },
+      process.env.JWT_KEY ?? "",
+      { expiresIn: "2d" }
+    );
 
-    res.status(201).json({ token, user: savedUser });
+    res.status(201).json({
+      token,
+      user: {
+        _id: savedUser._id,
+        name: savedUser.name,
+        email: savedUser.email,
+        isAdmin: savedUser.isAdmin,
+        lastLogin: savedUser.lastLogin,
+      },
+    });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -39,25 +52,33 @@ export const login = async (req: Request, res: Response) => {
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     // Check password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const updatedUser = {
-      ...user,
-      lastLogin: new Date()
-    }
-    await updatedUser.save();
+    // Update last login detail
+    await User.findByIdAndUpdate(user.id, { lastLogin: new Date() });
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY ?? '', { expiresIn: '2d' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_KEY ?? "", {
+      expiresIn: "2d",
+    });
 
-    res.json({ token, user });
+    res.json({
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        lastLogin: user.lastLogin,
+      },
+    });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

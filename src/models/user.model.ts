@@ -8,6 +8,7 @@ interface IUser extends Document {
   createdDate: Date;
   updatedDate: Date;
   lastLogin: Date;
+  isAdmin: Boolean;
 }
 
 // Define User schema
@@ -17,7 +18,8 @@ const userSchema = new Schema<IUser>({
   password: { type: String, required: true },
   createdDate: { type: Date, default: Date.now },
   updatedDate: { type: Date, default: Date.now },
-  lastLogin: { type: Date }
+  lastLogin: { type: Date },
+  isAdmin: { type: Boolean, default: false }
 });
 
 // Export User model
