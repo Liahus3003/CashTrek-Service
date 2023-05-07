@@ -45,13 +45,20 @@ export const getExpensesSumLast6MonthsByCategoryType = async (
       {
         $match: {
           date: { $gte: sixMonthsAgo },
-          categoryType,
+          category: categoryType,
         },
       },
       {
         $group: {
-          _id: "$categoryType",
+          _id: "$category",
           total: { $sum: "$amount" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          categoryType: "$_id",
+          total: 1,
         },
       },
     ]);

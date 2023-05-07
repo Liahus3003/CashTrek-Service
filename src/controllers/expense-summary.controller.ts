@@ -111,7 +111,7 @@ export const getTotalExpensesByCategoryTypeForMonth = async (
       },
       {
         $group: {
-          _id: "$categoryType",
+          _id: "$category",
           total: { $sum: "$amount" },
         },
       },
@@ -229,7 +229,7 @@ export const getExpensesForYearByCategoryType = async (
       },
       {
         $group: {
-          _id: "$categoryType",
+          _id: "$category",
           total: { $sum: "$amount" },
         },
       },
