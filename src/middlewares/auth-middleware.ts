@@ -21,18 +21,18 @@ export const authenticateUser = async (
       throw new Error("Authentication failed");
     }
     // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as {
-      _id: string;
+    const decoded = jwt.verify(token, process.env.JWT_KEY as string) as {
+      userId: string;
     };
     // Find the user in the database based on the decoded token
-    const user = await User.findById(decoded._id);
+    const user = await User.findById(decoded.userId);
     if (!user) {
-      throw new Error("Authentication failed");
+      throw new Error("Authentication failed: Could not find the user!");
     }
     // Attach the user object to the request object
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).send({ error: "Authentication failed" });
+    res.status(401).send({ error: "Authentication failed: Default error message!" });
   }
 };
