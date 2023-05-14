@@ -2,6 +2,7 @@ import { Document, Schema, model } from "mongoose";
 
 export interface IWishlist extends Document {
   name: string;
+  userId: string;
   budget: number;
   createdDate: Date;
   updatedDate: Date;
@@ -12,6 +13,7 @@ export interface IWishlist extends Document {
 const WishlistSchema = new Schema(
   {
     name: { type: String, required: true },
+    userId: { type: String, required: true },
     budget: { type: Number, required: true },
     date: { type: Date, default: Date.now },
     createdDate: { type: Date, default: Date.now },

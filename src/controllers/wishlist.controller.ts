@@ -4,9 +4,9 @@ import Wishlist, { IWishlist } from '../models/wishlist.model';
 // Create wishlist
 export const createWishlist = async (req: Request, res: Response) => {
   try {
-    const { name, budget, notes, priority }: IWishlist = req.body;
+    const { name, userId, budget, notes, priority }: IWishlist = req.body;
 
-    const wishlist = new Wishlist({ name, budget, notes, priority, createdDate: new Date() });
+    const wishlist = new Wishlist({ name, userId, budget, notes, priority, createdDate: new Date() });
     const savedWishlist = await wishlist.save();
 
     res.status(201).json(savedWishlist);
@@ -18,7 +18,7 @@ export const createWishlist = async (req: Request, res: Response) => {
 // Get all wishlists
 export const getAllWishlists = async (req: Request, res: Response) => {
   try {
-    const wishlists = await Wishlist.find();
+    const wishlists = await Wishlist.find({userId: req.query.userId});
     res.json(wishlists);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

@@ -4,9 +4,9 @@ import Expense, { IExpense } from '../models/expense.model';
 // Create expense
 export const createExpense = async (req: Request, res: Response) => {
   try {
-    const { name, amount, category, date, notes, site, isRebill, isSubscription, paymentMode, transactionType }: IExpense = req.body;
+    const { name, userId, amount, category, date, notes, site, isRebill, isSubscription, paymentMode, transactionType }: IExpense = req.body;
 
-    const expense = new Expense({  name, amount, category, date, notes, site, isRebill, isSubscription, paymentMode,
+    const expense = new Expense({ name, userId, amount, category, date, notes, site, isRebill, isSubscription, paymentMode,
       transactionType, createdDate: new Date() });
     const savedExpense = await expense.save();
 
@@ -19,7 +19,7 @@ export const createExpense = async (req: Request, res: Response) => {
 // Get all expenses
 export const getAllExpenses = async (req: Request, res: Response) => {
   try {
-    const expenses = await Expense.find();
+    const expenses = await Expense.find({userId: req.query.userId});
     res.json(expenses);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
