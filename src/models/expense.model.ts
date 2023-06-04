@@ -14,6 +14,7 @@ export interface IExpense extends Document {
   paymentMode: string;
   createdDate: Date;
   updatedDate: Date;
+  isActive: boolean;
 }
 
 const ExpenseSchema = new Schema(
@@ -31,6 +32,7 @@ const ExpenseSchema = new Schema(
     isRebill: { type: Boolean, required: true },
     isSubscription: { type: Boolean, required: true },
     paymentMode: { type: String, required: true },
+    isActive: { type: Boolean, default: true ,required: true},
   },
   { collection: "expenses" }
 );
