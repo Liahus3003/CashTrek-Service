@@ -4,9 +4,9 @@ import Expense, { IExpense } from '../models/expense.model';
 // Create expense
 export const createExpense = async (req: Request, res: Response) => {
   try {
-    const { name, userId, amount, category, date, notes, site, isRebill, isSubscription, paymentMode, transactionType }: IExpense = req.body;
+    const { name, userId, amount, category, date, notes, site, rebill, isSubscription, paymentMode, transactionType }: IExpense = req.body;
 
-    const expense = new Expense({ name, userId, amount, category, date, notes, site, isRebill, isSubscription, paymentMode,
+    const expense = new Expense({ name, userId, amount, category, date, notes, site, rebill, isSubscription, paymentMode,
       transactionType, createdDate: new Date() });
     const savedExpense = await expense.save();
 
