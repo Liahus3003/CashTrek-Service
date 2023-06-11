@@ -23,7 +23,12 @@ export const getExpensesForMonthPaginated = async (req: Request, res: Response) 
       .skip((parseInt(page) - 1) * parseInt(limit))
       .limit(parseInt(limit));
 
-    res.status(200).json({ expenses });
+    // Get total count of upcoming expenses by category type for pagination
+    const totalExpenses = await Expense.countDocuments({
+      date: { $gte: startDate, $lte: endDate }
+    });
+
+    res.status(200).json({ expenses, totalExpenses });
   } catch (err: any) {
     console.error("Failed to retrieve expenses for the particular month", err);
     res
@@ -124,7 +129,11 @@ export const getTotalExpensesByCategoryTypeForMonth = async (
       },
     ]);
 
-    res.status(200).json({ expenses });
+    const overallTotal = expenses.reduce((total: number, categoryType: any) => {
+      return total + categoryType.total;
+    }, 0);
+
+    res.status(200).json({ expenses, overallTotal });
   } catch (err: any) {
     console.error(
       "Failed to retrieve total expenses by category type for the month",
@@ -156,8 +165,12 @@ export const getExpensesForYearPaginated = async (
     })
       .skip((page - 1) * limit)
       .limit(limit);
+    // Get total count of upcoming expenses by category type for pagination
+    const totalExpenses = await Expense.countDocuments({
+      date: { $gte: startDate, $lte: endDate }
+    });
 
-    res.status(200).json({ expenses });
+    res.status(200).json({ expenses, totalExpenses });
   } catch (err: any) {
     console.error("Failed to retrieve expenses for the year", err);
     res.status(500).json({ error: "Failed to retrieve expenses for the year" });
@@ -168,39 +181,44 @@ export const getExpensesForYearPaginated = async (
 export const getExpenseDetailsForYear = async (req: Request, res: Response) => {
   try {
     const { year } = req.query as { year: string }; // Type casting query parameter to expected data type
+    let initialYear = parseInt(year);
+    let expenseDetails = [];
+    while (initialYear >= (+year - 1)) {
+      // Calculate the start and end dates of the year
+      const startDate = new Date(initialYear, 0, 1);
+      const endDate = new Date(initialYear, 11, 31);
 
-    // Calculate the start and end dates of the year
-    const startDate = new Date(parseInt(year), 0, 1);
-    const endDate = new Date(parseInt(year), 11, 31);
+      // Query to get expense details for all months in the year
+      const expenses = await Expense.aggregate([
+        {
+          $match: {
+            date: { $gte: startDate, $lte: endDate },
+          },
+        },
+        {
+          $group: {
+            _id: { month: { $month: "$date" } },
+            total: { $sum: "$amount" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            month: "$_id.month",
+            total: 1,
+          },
+        },
+      ]);
 
-    // Query to get expense details for all months in the year
-    const expenses = await Expense.aggregate([
-      {
-        $match: {
-          date: { $gte: startDate, $lte: endDate },
-        },
-      },
-      {
-        $group: {
-          _id: { month: { $month: "$date" } },
-          total: { $sum: "$amount" },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          month: "$_id.month",
-          total: 1,
-        },
-      },
-    ]);
-
-    // Default to 0 for months with no expenses
-    const expenseDetails = Array.from({ length: 12 }, (_, i) => {
-      const month = i + 1;
-      const expense = expenses.find((expense) => expense.month === month);
-      return { month, total: expense ? expense.total : 0 };
-    });
+      // Default to 0 for months with no expenses
+      const monthlyInfo = Array.from({ length: 12 }, (_, i) => {
+        const month = i + 1;
+        const expense = expenses.find((expense) => expense.month === month);
+        return { month, total: expense ? expense.total : 0 };
+      });
+      expenseDetails.push({ [initialYear.toString()] : monthlyInfo })
+      initialYear--;
+    }
 
     res.status(200).json({ expenseDetails });
   } catch (err: any) {
@@ -242,7 +260,11 @@ export const getExpensesForYearByCategoryType = async (
       },
     ]);
 
-    res.status(200).json({ expenses });
+    const overallTotal = expenses.reduce((total: number, categoryType: any) => {
+      return total + categoryType.total;
+    }, 0);
+
+    res.status(200).json({ expenses, overallTotal });
   } catch (err: any) {
     console.error(
       "Failed to retrieve expenses by categoryType for the year",
