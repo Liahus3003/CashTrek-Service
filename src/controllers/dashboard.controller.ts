@@ -7,6 +7,7 @@ export const getExpenseDataLast6Months = async (
   res: Response
 ) => {
   try {
+    const userId = req.headers['x-user-id'];
     // Get the current date
     const currentDate = new Date();
 
@@ -16,6 +17,7 @@ export const getExpenseDataLast6Months = async (
 
     // Find expenses that were created within the last 6 months
     const expenses = await Expense.find({
+      userId,
       createdAt: { $gte: sixMonthsAgo, $lte: currentDate },
     });
 
@@ -35,6 +37,7 @@ export const getExpensesSumLast6MonthsByCategoryType = async (
 ) => {
   try {
     const { categoryType } = req.query; // Get category type from query parameters
+    const userId = req.headers['x-user-id'];
 
     // Calculate the date 6 months ago from today
     const sixMonthsAgo = new Date();
@@ -44,6 +47,7 @@ export const getExpensesSumLast6MonthsByCategoryType = async (
     const expenses = await Expense.aggregate([
       {
         $match: {
+          userId,
           date: { $gte: sixMonthsAgo },
           category: categoryType,
         },
@@ -81,6 +85,7 @@ export const getUpcomingTransactionsByType = async (
 ) => {
   try {
     const { page, limit, transactionType } = req.query;
+    const userId = req.headers['x-user-id'];
     const pageNumber = parseInt(page as string) || 1;
     const limitNumber = parseInt(limit as string) || 10;
 
@@ -90,6 +95,7 @@ export const getUpcomingTransactionsByType = async (
 
     // Query to get upcoming expenses by category type sorted by date in ascending order
     const expenses = await Expense.find({
+      userId,
       date: { $gte: new Date() },
       transactionType,
     })

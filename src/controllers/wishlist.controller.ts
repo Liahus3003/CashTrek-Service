@@ -18,7 +18,8 @@ export const createWishlist = async (req: Request, res: Response) => {
 // Get all wishlists
 export const getAllWishlists = async (req: Request, res: Response) => {
   try {
-    const wishlists = await Wishlist.find({userId: req.query.userId});
+    const userId = req.headers['x-user-id'];
+    const wishlists = await Wishlist.find({userId});
     res.json(wishlists);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

@@ -19,7 +19,8 @@ export const createExpense = async (req: Request, res: Response) => {
 // Get all expenses
 export const getAllExpenses = async (req: Request, res: Response) => {
   try {
-    const expenses = await Expense.find({userId: req.query.userId});
+    const userId = req.headers['x-user-id'];
+    const expenses = await Expense.find({userId});
     res.json(expenses);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

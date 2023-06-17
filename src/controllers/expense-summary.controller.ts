@@ -18,9 +18,10 @@ export const getExpensesForMonthPaginated = async (
     // Calculate the start and end dates of the month
     const startDate = new Date(parseInt(year), parseInt(month) - 1, 1);
     const endDate = new Date(parseInt(year), parseInt(month), 0);
-
+    const userId = req.headers['x-user-id'];
     // Query to get expenses for the particular month with pagination
     const expenses = await Expense.find({
+      userId,
       date: { $gte: startDate, $lte: endDate },
     })
       .sort({ date: "desc" })
@@ -29,6 +30,7 @@ export const getExpensesForMonthPaginated = async (
 
     // Get total count of upcoming expenses by category type for pagination
     const totalExpenses = await Expense.countDocuments({
+      userId,
       date: { $gte: startDate, $lte: endDate },
     });
 
@@ -51,6 +53,7 @@ export const getExpenseDetailsForMonth = async (
       month: string;
       year: string;
     };
+    const userId = req.headers['x-user-id'];
     let initialMonth = parseInt(month);
     let initialYear = parseInt(year);
     let expenseDetails = [];
@@ -67,6 +70,7 @@ export const getExpenseDetailsForMonth = async (
       const expenses = await Expense.aggregate([
         {
           $match: {
+            userId,
             date: { $gte: startDate, $lt: endDate },
           },
         },
@@ -120,7 +124,8 @@ export const getTotalExpensesByCategoryTypeForMonth = async (
 ) => {
   try {
     const { month, year } = req.query as { month: string; year: string }; // Type casting query parameters to expected data types
-
+    const userId = req.headers['x-user-id'];
+    
     // Calculate the start and end dates of the month
     const startDate = new Date(parseInt(year), parseInt(month) - 1, 1);
     const endDate = new Date(parseInt(year), parseInt(month), 0);
@@ -129,6 +134,7 @@ export const getTotalExpensesByCategoryTypeForMonth = async (
     const expenses = await Expense.aggregate([
       {
         $match: {
+          userId,
           date: { $gte: startDate, $lte: endDate },
         },
       },
@@ -172,6 +178,7 @@ export const getExpensesForYearPaginated = async (
     const { year } = req.query as { year: string }; // Type casting query parameter to expected data type
     const page = parseInt(req.query.page as string) || 1; // Get the page number from query parameter, default to 1 if not provided
     const limit = parseInt(req.query.limit as string) || 10; // Get the limit per page from query parameter, default to 10 if not provided
+    const userId = req.headers['x-user-id'];
 
     // Calculate the start and end dates of the year
     const startDate = new Date(parseInt(year), 0, 1);
@@ -179,6 +186,7 @@ export const getExpensesForYearPaginated = async (
 
     // Query to get expenses for the specified year, paginated
     const expenses = await Expense.find({
+      userId,
       date: { $gte: startDate, $lte: endDate },
     })
       .skip((page - 1) * limit)
@@ -199,6 +207,8 @@ export const getExpensesForYearPaginated = async (
 export const getExpenseDetailsForYear = async (req: Request, res: Response) => {
   try {
     const { year } = req.query as { year: string }; // Type casting query parameter to expected data type
+    const userId = req.headers['x-user-id'];
+
     let initialYear = parseInt(year);
     let expenseDetails = [];
     while (initialYear >= +year - 1) {
@@ -210,6 +220,7 @@ export const getExpenseDetailsForYear = async (req: Request, res: Response) => {
       const expenses = await Expense.aggregate([
         {
           $match: {
+            userId,
             date: { $gte: startDate, $lte: endDate },
           },
         },
@@ -251,6 +262,7 @@ export const getExpensesForYearByCategoryType = async (
 ) => {
   try {
     const { year } = req.query as { year: string }; // Type casting query parameter to expected data type
+    const userId = req.headers['x-user-id'];
 
     // Calculate the start and end dates of the year
     const startDate = new Date(parseInt(year), 0, 1);
@@ -260,6 +272,7 @@ export const getExpensesForYearByCategoryType = async (
     const expenses = await Expense.aggregate([
       {
         $match: {
+          userId,
           date: { $gte: startDate, $lte: endDate },
         },
       },
