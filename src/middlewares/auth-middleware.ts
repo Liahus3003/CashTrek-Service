@@ -29,8 +29,8 @@ export const authenticateUser = async (
     if (!user) {
       throw new Error("Authentication failed: Could not find the user!");
     }
-    // Attach the user object to the request object
-    req.user = user;
+    // Attach the user information to the request headers
+    req.headers['x-user-id'] = decoded.userId;
     next();
   } catch (error) {
     res.status(401).send({ error: "Authentication failed: Default error message!" });
