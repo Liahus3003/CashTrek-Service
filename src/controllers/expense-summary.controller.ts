@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import Expense from "../models/expense.model";
+import { getMonthName } from "../utils/helper";
 
 // Route handler for getting expenses for a particular month with pagination
-export const getExpensesForMonthPaginated = async (req: Request, res: Response) => {
+export const getExpensesForMonthPaginated = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const { month, year, page, limit } = req.query as {
       month: string;
@@ -25,7 +29,7 @@ export const getExpensesForMonthPaginated = async (req: Request, res: Response) 
 
     // Get total count of upcoming expenses by category type for pagination
     const totalExpenses = await Expense.countDocuments({
-      date: { $gte: startDate, $lte: endDate }
+      date: { $gte: startDate, $lte: endDate },
     });
 
     res.status(200).json({ expenses, totalExpenses });
@@ -46,44 +50,58 @@ export const getExpenseDetailsForMonth = async (
     const { month, year } = req.query as {
       month: string;
       year: string;
-      page: string;
-      limit: string;
     };
+    let initialMonth = parseInt(month);
+    let initialYear = parseInt(year);
+    let expenseDetails = [];
+    while (initialMonth >= +month - 1) {
+      if (initialMonth < 0) {
+        initialMonth = 12;
+        initialYear--;
+      }
+      // Calculate the start and end dates of the month
+      const startDate = new Date(initialYear, initialMonth - 1, 1);
+      const endDate = new Date(initialYear, initialMonth, 1);
 
-    // Calculate the start and end dates of the month
-    const startDate = new Date(parseInt(year), parseInt(month) - 1, 1);
-    const endDate = new Date(parseInt(year), parseInt(month), 0);
-
-    // Query to get expense details for all days in the month
-    const expenses = await Expense.aggregate([
-      {
-        $match: {
-          date: { $gte: startDate, $lte: endDate },
-        },
-      },
-      {
-        $group: {
-          _id: {
-            day: { $dayOfMonth: "$date" },
-            month: { $month: "$date" },
-            year: { $year: "$date" },
+      // Query to get expense details for all days in the month
+      const expenses = await Expense.aggregate([
+        {
+          $match: {
+            date: { $gte: startDate, $lt: endDate },
           },
-          total: { $sum: "$amount" },
         },
-      },
-      {
-        $project: {
-          _id: 0,
-          day: "$_id.day",
-          total: 1,
+        {
+          $group: {
+            _id: {
+              day: { $dayOfMonth: "$date" },
+              month: { $month: "$date" },
+              year: { $year: "$date" },
+            },
+            total: { $sum: "$amount" },
+          },
         },
-      },
-      {
-        $sort: { day: 1 },
-      },
-    ]);
+        {
+          $project: {
+            _id: 0,
+            day: "$_id.day",
+            total: 1,
+          },
+        },
+        {
+          $sort: { day: 1 },
+        },
+      ]);
+      // Default to 0 for months with no expenses
+      const monthlyInfo = Array.from({ length: new Date(initialYear, initialMonth - 1, 0).getDate() }, (_, i) => {
+        const day = i + 1;
+        const expense = expenses.find((expense) => expense.day === day);
+        return { day, total: expense ? expense.total : 0 };
+      });
+      expenseDetails.push({ [`${getMonthName(initialMonth)}, ${initialYear}`]: monthlyInfo });
+      initialMonth--;
+    }
 
-    res.status(200).json({ expenses });
+    res.status(200).json({ expenseDetails });
   } catch (err: any) {
     console.error(
       "Failed to retrieve expense details for all days in the month",
@@ -167,7 +185,7 @@ export const getExpensesForYearPaginated = async (
       .limit(limit);
     // Get total count of upcoming expenses by category type for pagination
     const totalExpenses = await Expense.countDocuments({
-      date: { $gte: startDate, $lte: endDate }
+      date: { $gte: startDate, $lte: endDate },
     });
 
     res.status(200).json({ expenses, totalExpenses });
@@ -183,7 +201,7 @@ export const getExpenseDetailsForYear = async (req: Request, res: Response) => {
     const { year } = req.query as { year: string }; // Type casting query parameter to expected data type
     let initialYear = parseInt(year);
     let expenseDetails = [];
-    while (initialYear >= (+year - 1)) {
+    while (initialYear >= +year - 1) {
       // Calculate the start and end dates of the year
       const startDate = new Date(initialYear, 0, 1);
       const endDate = new Date(initialYear, 11, 31);
@@ -216,7 +234,7 @@ export const getExpenseDetailsForYear = async (req: Request, res: Response) => {
         const expense = expenses.find((expense) => expense.month === month);
         return { month, total: expense ? expense.total : 0 };
       });
-      expenseDetails.push({ [initialYear.toString()] : monthlyInfo })
+      expenseDetails.push({ [initialYear.toString()]: monthlyInfo });
       initialYear--;
     }
 
@@ -270,10 +288,8 @@ export const getExpensesForYearByCategoryType = async (
       "Failed to retrieve expenses by categoryType for the year",
       err
     );
-    res
-      .status(500)
-      .json({
-        error: "Failed to retrieve expenses by categoryType for the year",
-      });
+    res.status(500).json({
+      error: "Failed to retrieve expenses by categoryType for the year",
+    });
   }
 };
