@@ -132,8 +132,8 @@ export const getExpensesSumLast6MonthsByCategoryType = async (
   }
 };
 
-// Route handler for getting upcoming transactions by category type with pagination
-export const getUpcomingTransactionsByType = async (
+// Route handler for getting transactions by type with pagination
+export const getTransactionsByType = async (
   req: Request,
   res: Response
 ) => {
@@ -147,24 +147,18 @@ export const getUpcomingTransactionsByType = async (
     const skip = (pageNumber - 1) * limitNumber;
     const offset = limitNumber;
 
-    // Query to get upcoming expenses by category type sorted by date in ascending order
-    const expenses = await Expense.find({
+    // Query to get upcoming expenses by transaction type sorted by date in ascending order
+    const transactions = await Expense.find({
       userId,
-      date: { $gte: new Date() },
+      date: { $lte: new Date() },
       transactionType,
-    })
+    }, { name: 1, amount: 1, category: 1, date: 1 })
       .sort({ date: 1 })
       .skip(skip)
       .limit(offset);
 
-    // Get total count of upcoming expenses by category type for pagination
-    const totalExpenses = await Expense.countDocuments({
-      date: { $gte: new Date() },
-      transactionType,
-    });
-
-    // Return the expenses and total count as JSON response
-    res.status(200).json({ expenses, totalExpenses });
+    // Return the transactions
+    res.status(200).json(transactions);
   } catch (err: any) {
     // Handle any errors that occurred during the database query
     console.error("Failed to retrieve upcoming expenses by category type", err);

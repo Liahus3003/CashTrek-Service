@@ -2,7 +2,7 @@ import express from 'express';
 import {
   getExpenseDataLast6Months,
   getExpensesSumLast6MonthsByCategoryType,
-  getUpcomingTransactionsByType
+  getTransactionsByType
 } from '../controllers/dashboard.controller';
 
 const router = express.Router();
@@ -14,6 +14,6 @@ router.get('/last-six-months-expense', getExpenseDataLast6Months);
 router.get('/last-six-months-expense-sum', getExpensesSumLast6MonthsByCategoryType);
 
 // Get all transactions based on Transaction Type
-router.get('/transactions', getUpcomingTransactionsByType);
+router.get('/transactions', getTransactionsByType);
 
 export default router;
