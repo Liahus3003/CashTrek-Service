@@ -29,7 +29,7 @@ const ExpenseSchema = new Schema(
     updatedDate: { type: Date, default: Date.now },
     notes: { type: String, required: true },
     site: { type: String },
-    rebill: { type: String, required: true },
+    rebill: { type: String },
     isSubscription: { type: Boolean, required: true },
     paymentMode: { type: String, required: true },
     isActive: { type: Boolean, default: true ,required: true},

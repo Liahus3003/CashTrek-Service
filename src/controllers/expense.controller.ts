@@ -4,7 +4,8 @@ import Expense, { IExpense } from '../models/expense.model';
 // Create expense
 export const createExpense = async (req: Request, res: Response) => {
   try {
-    const { name, userId, amount, category, date, notes, site, rebill, isSubscription, paymentMode, transactionType }: IExpense = req.body;
+    const { name, amount, category, date, notes, site, rebill, isSubscription, paymentMode, transactionType }: IExpense = req.body;
+    const userId = req.headers['x-user-id'];
 
     const expense = new Expense({ name, userId, amount, category, date, notes, site, rebill, isSubscription, paymentMode,
       transactionType, createdDate: new Date() });

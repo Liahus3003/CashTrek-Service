@@ -152,7 +152,7 @@ export const getTransactionsByType = async (
       userId,
       date: { $lte: new Date() },
       transactionType,
-    }, { name: 1, amount: 1, category: 1, date: 1 })
+    }, { name: 1, amount: 1, date: 1 })
       .sort({ date: 1 })
       .skip(skip)
       .limit(offset);
