@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Expense from "../models/expense.model";
+import { getMonthName } from "../utils/helper";
 
 // Route handler for getting expense data for the last 6 months
 export const getExpenseDataLast6Months = async (
@@ -7,21 +8,72 @@ export const getExpenseDataLast6Months = async (
   res: Response
 ) => {
   try {
-    const userId = req.headers['x-user-id'];
-    // Get the current date
     const currentDate = new Date();
+    const userId = req.headers['x-user-id'];
+    let initialMonth = currentDate.getMonth() + 1;
+    let initialYear = currentDate.getFullYear();
+    let expenseDetails = [];
+    for (let i = 0; i < 6; i++) {
+      if (initialMonth < 0) {
+        initialMonth = 12;
+        initialYear--;
+      }
+      // Calculate the start and end dates of the month
+      const startDate = new Date(initialYear, initialMonth - 1, 1);
+      const endDate = new Date(initialYear, initialMonth, 1);
 
-    // Calculate the date 6 months ago from the current date
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(currentDate.getMonth() - 6);
+      // Query to get expense details for all days in the month
+      let expenses = await Expense.aggregate([
+        {
+          $match: {
+            userId,
+            date: { $gte: startDate, $lt: endDate },
+          },
+        },
+        {
+          $group: {
+            _id: { month: { $month: "$date" } },
+            totalCredit: {
+              $sum: {
+                $cond: [{ $eq: ['$transactionType', 'Credit'] }, '$amount', 0]
+              }
+            },
+            totalExpense: {
+              $sum: {
+                $cond: [{ $eq: ['$transactionType', 'Expense'] }, '$amount', 0]
+              }
+            }
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            period: "$_id.month",
+            totalCredit: 1,
+            totalExpense: 1
+          },
+        },
+      ]);
+      // Default to 0 for months with no expenses
+      if (!expenses?.length) {
+        expenses = [
+          { 
+            totalCredit: 0,
+            totalExpense: 0,
+            period: `${getMonthName(initialMonth)}, ${initialYear}`
+          }
+        ];
+      } else {
+        expenses = expenses.map(expense => {
+          expense.period = `${getMonthName(initialMonth)}, ${initialYear}`;
+          return expense;
+        });
+      }
+      expenseDetails.push(expenses[0]);
+      initialMonth--;
+    }
 
-    // Find expenses that were created within the last 6 months
-    const expenses = await Expense.find({
-      userId,
-      createdAt: { $gte: sixMonthsAgo, $lte: currentDate },
-    });
-
-    res.status(200).json({ expenses });
+    res.status(200).json({ expenseDetails });
   } catch (err: any) {
     console.error("Failed to retrieve expense data for the last 6 months", err);
     res
@@ -36,7 +88,6 @@ export const getExpensesSumLast6MonthsByCategoryType = async (
   res: Response
 ) => {
   try {
-    const { categoryType } = req.query; // Get category type from query parameters
     const userId = req.headers['x-user-id'];
 
     // Calculate the date 6 months ago from today
@@ -49,7 +100,6 @@ export const getExpensesSumLast6MonthsByCategoryType = async (
         $match: {
           userId,
           date: { $gte: sixMonthsAgo },
-          category: categoryType,
         },
       },
       {
@@ -67,7 +117,11 @@ export const getExpensesSumLast6MonthsByCategoryType = async (
       },
     ]);
 
-    res.status(200).json({ expenses });
+    const overallTotal = expenses.reduce((total: number, categoryType: any) => {
+      return total + categoryType.total;
+    }, 0);
+
+    res.status(200).json({ expenses, overallTotal });
   } catch (err: any) {
     res
       .status(500)
