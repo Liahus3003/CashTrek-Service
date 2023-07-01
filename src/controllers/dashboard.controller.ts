@@ -72,8 +72,13 @@ export const getExpenseDataLast6Months = async (
       expenseDetails.push(expenses[0]);
       initialMonth--;
     }
-
-    res.status(200).json({ expenseDetails });
+    const accCredit = expenseDetails.reduce((total: number, expense: any) => {
+      return total + expense.totalCredit;
+    }, 0);
+    const accExpense = expenseDetails.reduce((total: number, expense: any) => {
+      return total + expense.totalExpense;
+    }, 0);
+    res.status(200).json({ expenseDetails, accCredit, accExpense });
   } catch (err: any) {
     console.error("Failed to retrieve expense data for the last 6 months", err);
     res
