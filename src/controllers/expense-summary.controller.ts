@@ -72,6 +72,7 @@ export const getExpenseDetailsForMonth = async (
           $match: {
             userId,
             date: { $gte: startDate, $lt: endDate },
+            transactionType: 'Expense'
           },
         },
         {
@@ -136,6 +137,7 @@ export const getTotalExpensesByCategoryTypeForMonth = async (
         $match: {
           userId,
           date: { $gte: startDate, $lte: endDate },
+          transactionType: 'Expense'
         },
       },
       {
@@ -187,7 +189,7 @@ export const getExpensesForYearPaginated = async (
     // Query to get expenses for the specified year, paginated
     const expenses = await Expense.find({
       userId,
-      date: { $gte: startDate, $lte: endDate },
+      date: { $gte: startDate, $lte: endDate }
     })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -222,6 +224,7 @@ export const getExpenseDetailsForYear = async (req: Request, res: Response) => {
           $match: {
             userId,
             date: { $gte: startDate, $lte: endDate },
+            transactionType: 'Expense'
           },
         },
         {
@@ -274,6 +277,7 @@ export const getExpensesForYearByCategoryType = async (
         $match: {
           userId,
           date: { $gte: startDate, $lte: endDate },
+          transactionType: 'Expense'
         },
       },
       {
