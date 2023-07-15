@@ -155,11 +155,36 @@ export const getTotalExpensesByCategoryTypeForMonth = async (
       },
     ]);
 
+    // Query to get total expenses in the YTD
+    const expenseYTD = await Expense.aggregate([
+      {
+        $match: {
+          userId,
+          date: { $gte: new Date(+year, 0, 1), $lte: new Date(+year, 11, 31) },
+          transactionType: 'Expense'
+        },
+      },
+      {
+        $group: {
+          _id: "$userId",
+          total: { $sum: "$amount" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          total: 1,
+        },
+      },
+    ]);
+
     const overallTotal = expenses.reduce((total: number, categoryType: any) => {
       return total + categoryType.total;
     }, 0);
 
-    res.status(200).json({ expenses, overallTotal });
+    const averageComparison: number = +(expenseYTD[0]?.total/(+month - 1) ?? 0).toFixed(0);
+
+    res.status(200).json({ expenses, overallTotal, averageComparison });
   } catch (err: any) {
     console.error(
       "Failed to retrieve total expenses by category type for the month",
@@ -295,11 +320,34 @@ export const getExpensesForYearByCategoryType = async (
       },
     ]);
 
+    // Query to get total expenses in Last Year
+    const previousExpense = await Expense.aggregate([
+      {
+        $match: {
+          userId,
+          date: { $gte: new Date(parseInt(year) - 1, 0, 1), $lte: new Date(parseInt(year) - 1, 11, 31) },
+          transactionType: 'Expense'
+        },
+      },
+      {
+        $group: {
+          _id: "$userId",
+          total: { $sum: "$amount" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          total: 1,
+        },
+      },
+    ]);
+
     const overallTotal = expenses.reduce((total: number, categoryType: any) => {
       return total + categoryType.total;
     }, 0);
 
-    res.status(200).json({ expenses, overallTotal });
+    res.status(200).json({ expenses, overallTotal, averageComparison: +(previousExpense[0]?.total ?? 0).toFixed(0) });
   } catch (err: any) {
     console.error(
       "Failed to retrieve expenses by categoryType for the year",
